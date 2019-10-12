@@ -1,4 +1,4 @@
-package com.zaib.coroutine_api_sample
+package com.zaib.views
 
 import org.junit.Test
 
