@@ -18,8 +18,8 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun setCityName(cityName: String) {
-        if (_cityName.value == null)
-            return
+//        if (_cityName.value == null)
+//            return
 
         _cityName.value = cityName
     }

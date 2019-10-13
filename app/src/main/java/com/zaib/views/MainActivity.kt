@@ -34,6 +34,9 @@ class MainActivity : AppCompatActivity() {
         mBinding?.viewDailyWeather?.adapter = itemCityWeatherAdapter
 
 
+        viewModel?.setCityName("Lahore")
+
+
         viewModel?.getCityForeCast?.observe(this, Observer {
 
             Log.v("DEBUG ZAIB: $it", it.toString())
@@ -42,7 +45,6 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        viewModel?.setCityName("Lahore")
     }
 
     override fun onDestroy() {

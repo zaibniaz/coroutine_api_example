@@ -27,7 +27,7 @@ class RetrofitBuilder
                 .build()
 
             return Retrofit.Builder()
-                .baseUrl("http://dataservice.accuweather.com/locations/v1")
+                .baseUrl("https://dataservice.accuweather.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .client(okHttpClient)

@@ -1,4 +1,4 @@
-package com.zaib.responsemodel.CityInfo
+package com.zaib.responsemodel.cityinfomodel
 
 data class AdministrativeArea(
     val ID: String,

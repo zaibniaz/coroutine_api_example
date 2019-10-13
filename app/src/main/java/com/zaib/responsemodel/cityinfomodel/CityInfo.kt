@@ -1,6 +1,6 @@
-package com.zaib.responsemodel.CityInfo
+package com.zaib.responsemodel.cityinfomodel
 
-data class CitiesInfoList(
+data class CityInfo(
     val AdministrativeArea: AdministrativeArea,
     val Country: Country,
     val Key: String,

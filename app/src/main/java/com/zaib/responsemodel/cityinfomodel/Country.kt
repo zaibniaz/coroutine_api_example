@@ -1,4 +1,4 @@
-package com.zaib.responsemodel.CityInfo
+package com.zaib.responsemodel.cityinfomodel
 
 data class Country(
     val ID: String,

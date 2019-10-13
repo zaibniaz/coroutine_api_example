@@ -1,11 +1,9 @@
 package com.zaib.repos
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.zaib.networking.RetrofitBuilder
 import com.zaib.projectutils.ProjectConstants
 import com.zaib.responsemodel.CityForeCast
-import com.zaib.responsemodel.CityInfo.CitiesInfoList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -54,9 +52,9 @@ object MainActivityRepo {
             var result1: Int = 0
             val job = launch {
                 // println("debug: launching job1: ${Thread.currentThread().name}")
-                val citiesInfoList = RetrofitBuilder.getCorService()
+                val citiesInfo = RetrofitBuilder.getCorService()
                     .getCitiesInfoList(cityName, ProjectConstants.appId)
-                result1 = citiesInfoList.Rank
+                result1 =citiesInfo[0].Rank
 
             }
             job.join()
