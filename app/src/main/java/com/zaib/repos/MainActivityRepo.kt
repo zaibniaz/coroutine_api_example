@@ -2,11 +2,15 @@ package com.zaib.repos
 
 import androidx.lifecycle.MutableLiveData
 import com.zaib.networking.RetrofitBuilder
+import com.zaib.projectutils.ProgressDialogBox
 import com.zaib.projectutils.ProjectConstants
 import com.zaib.responsemodel.CityForeCast
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 object MainActivityRepo {
@@ -44,40 +48,34 @@ object MainActivityRepo {
 
     fun getDailyForeCastForFiveDays(cityName: String): MutableLiveData<CityForeCast> {
 
-        //  job = Job()
+        CoroutineScope(IO).launch {
 
-        //job?.let { theJob ->
-        CoroutineScope(IO /*+ theJob*/).launch {
+            val cityIdList = withContext(CoroutineScope(IO).coroutineContext) {
 
-            var result1: Int = 0
-            val job = launch {
-                // println("debug: launching job1: ${Thread.currentThread().name}")
-                val citiesInfo = RetrofitBuilder.getCorService()
-                    .getCitiesInfoList(cityName, ProjectConstants.appId)
-                result1 =citiesInfo[0].Rank
+                RetrofitBuilder.getCorService().getCitiesInfoList(cityName, ProjectConstants.appId)
 
             }
-            job.join()
+            if (cityIdList.isNotEmpty()) {
 
-            val result2 = async {
-                println("debug: launching job2: ${Thread.currentThread().name}")
-                val cityForeCast = RetrofitBuilder.getCorService()
-                    .getDailyForeCastForFiveDays(
-                        result1,
-                        ProjectConstants.appId
-                    )
+
+                val cityForeCast = withContext(CoroutineScope(IO).coroutineContext) {
+
+
+                    RetrofitBuilder.getCorService()
+                        .getDailyForeCastForFiveDays(
+                            cityIdList[0].Rank,
+                            ProjectConstants.appId
+                        )
+                }
 
                 withContext(Main)
                 {
                     mutableLiveData.value = cityForeCast
                 }
-            }.await()
-            println("Got result2: $result2")
-
+            }
+            else
+                ProgressDialogBox.ShowDismissDialog(false)
         }
-        // }
-
-
         return mutableLiveData
     }
 

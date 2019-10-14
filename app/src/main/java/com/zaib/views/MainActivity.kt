@@ -2,7 +2,6 @@ package com.zaib.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +29,8 @@ class MainActivity : AppCompatActivity() , SearchView.OnQueryTextListener
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
+        ProgressDialogBox.setProgressBar(this@MainActivity)
+
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
 
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity() , SearchView.OnQueryTextListener
         viewModel?.getCityForeCast?.observe(this, Observer {
 
            // Log.v("DEBUG ZAIB: $it", it.toString())
-            ProgressDialogBox.dismissDialog()
+           ProgressDialogBox.ShowDismissDialog(false)
 
             itemCityWeatherAdapter?.setForeCastDataList(it.DailyForecasts)
 
@@ -57,8 +58,7 @@ class MainActivity : AppCompatActivity() , SearchView.OnQueryTextListener
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-
-        ProgressDialogBox.setProgressBar(this)
+       ProgressDialogBox.ShowDismissDialog(true)
         viewModel?.setCityName(query.toString())
 
         return false
