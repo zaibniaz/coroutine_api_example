@@ -3,7 +3,7 @@ package com.zaib.responsemodel
 data class DailyForecast(
     val Date: String,
     val Day: Day,
-    val EpochDate: Int,
+    val EpochDate: Long,
     val Link: String,
     val MobileLink: String,
     val Night: Night,

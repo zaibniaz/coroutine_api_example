@@ -37,6 +37,7 @@ class ItemCityWeatherAdapter(context: Context) :
     }
 
     fun setForeCastDataList(foreCastList: ArrayList<DailyForecast>) {
+        this.foreCastList.clear()
         this.foreCastList = foreCastList
         notifyDataSetChanged()
     }
