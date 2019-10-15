@@ -2,28 +2,23 @@ package com.zaib.networking
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import okhttp3.logging.HttpLoggingInterceptor
 
 
+class RetrofitBuilder {
 
-class RetrofitBuilder
-{
-
-    companion object
-    {
-        private  val interceptor = HttpLoggingInterceptor()
+    companion object {
 
         fun getCorService(): RestApiService {
 
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
 
-            val okHttpClient = OkHttpClient.Builder().connectTimeout(1,TimeUnit.MINUTES)
-                .readTimeout(30,TimeUnit.SECONDS)
-                .addInterceptor(interceptor)
-                .writeTimeout(15,TimeUnit.SECONDS)
+            val okHttpClient = OkHttpClient.Builder().connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(provideLoggingInterceptor())
+                .writeTimeout(15, TimeUnit.SECONDS)
                 .build()
 
             return Retrofit.Builder()
@@ -32,6 +27,13 @@ class RetrofitBuilder
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .client(okHttpClient)
                 .build().create(RestApiService::class.java)
+        }
+
+
+        private fun provideLoggingInterceptor(): HttpLoggingInterceptor {
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            return interceptor
         }
 
 

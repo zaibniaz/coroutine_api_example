@@ -1,86 +1,114 @@
 package com.zaib.repos
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.zaib.baserepos.BaseRepository
 import com.zaib.networking.RetrofitBuilder
-import com.zaib.projectutils.ProgressDialogBox
 import com.zaib.projectutils.ProjectConstants
 import com.zaib.responsemodel.CityForeCast
-import kotlinx.coroutines.CompletableJob
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 
-object MainActivityRepo {
+object MainActivityRepo : BaseRepository() {
 
-    var job: CompletableJob? = null
     private var mutableLiveData = MutableLiveData<CityForeCast>()
-
-    //   suspend fun getDailyForeCastForFiveDays(cityId: Long): LiveData<CityForeCast> {
-    //      job = Job()
-
-//        return object : LiveData<CityForeCast>() {
-//            override fun onActive() {
-//                super.onActive()
-//
-//                job?.let { theJob ->
-//                    CoroutineScope.(IO + theJob).launch {
-//                        val cityForeCast = RetrofitBuilder.getCorService()
-//                            .getDailyForeCastForFiveDays(
-//                                cityId,
-//                                ProjectConstants.appId
-//                            )
-//
-//                        withContext(Main)
-//                        {
-//                            value = cityForeCast
-//                            theJob.complete()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-    //}
+    private var job: Job? = null
 
 
     fun getDailyForeCastForFiveDays(cityName: String): MutableLiveData<CityForeCast> {
 
-        CoroutineScope(IO).launch {
+        job = CoroutineScope(IO).launch {
 
-            val cityIdList = withContext(CoroutineScope(IO).coroutineContext) {
-
-                RetrofitBuilder.getCorService().getCitiesInfoList(cityName, ProjectConstants.appId)
-
-            }
-            if (cityIdList.isNotEmpty()) {
-
-
-                val cityForeCast = withContext(CoroutineScope(IO).coroutineContext) {
+            val listResponse =
+                RetrofitBuilder.getCorService()
+                    .getLocationsListAsync(cityName, ProjectConstants.appId).await()
+            try {
+                if (listResponse.isSuccessful) {
 
 
-                    RetrofitBuilder.getCorService()
-                        .getDailyForeCastForFiveDays(
-                            cityIdList[0].Rank,
+                    val cityForeCastResponse: Response<CityForeCast> =
+                        RetrofitBuilder.getCorService().getDailyForeCastForFiveDaysAsync(
+                            listResponse.body()?.get(0)?.Rank!!,
                             ProjectConstants.appId
-                        )
+                        ).await()
+
+
+                    try {
+                        if (cityForeCastResponse.isSuccessful) {
+                            withContext(Dispatchers.Main)
+                            {
+                                mutableLiveData.value = cityForeCastResponse.body()
+                            }
+                        } else
+                        {
+                            Log.d("MainActivity ", cityForeCastResponse.errorBody().toString())
+                        }
+
+                    } catch (e: Exception) {
+
+                    }
+
+
+                } else {
+                    Log.d("MainActivity ", listResponse.errorBody().toString())
                 }
 
-                withContext(Main)
-                {
-                    mutableLiveData.value = cityForeCast
-                }
+            } catch (e: Exception) {
+
             }
-            else
-                ProgressDialogBox.ShowDismissDialog(false)
+
+
         }
         return mutableLiveData
     }
 
+//
+//        fun getDailyForeCastForFiveDays(cityName: String): MutableLiveData<CityForeCast> {
+//
+//
+//            job = CoroutineScope(IO).launch {
+//
+//
+//                val list = safeApiCall(
+//                    call = {
+//                        RetrofitBuilder.getCorService()
+//                            .getLocationsListAsync(cityName, ProjectConstants.appId).await()
+//                    },
+//                    errorMessage = "Error Fetching"
+//                )
+//
+//                if (!list.isNullOrEmpty()) {
+//                    val cityForeCast = safeApiCall(
+//                        call = {
+//                            RetrofitBuilder.getCorService().getDailyForeCastForFiveDaysAsync(
+//                                list[0].Rank,
+//                                ProjectConstants.appId
+//                            ).await()
+//                        },
+//                        errorMessage = "Error Fetching"
+//                    )
+//                    withContext(Main)
+//                    {
+//                        mutableLiveData.value = cityForeCast
+//                    }
+//                } else {
+//                    ProgressDialogBox.ShowDismissDialog(false)
+//
+//                }
+//            }
+//            return mutableLiveData
+//        }
+//
+//        fun cancelJob() {
+//            job?.cancel()
+//        }
+
+
     fun cancelJob() {
         job?.cancel()
     }
+
 
 }

@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.zaib.repos.MainActivityRepo
 import com.zaib.responsemodel.CityForeCast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
 
@@ -18,7 +16,7 @@ class MainActivityViewModel : ViewModel() {
     {
 
 
-        MainActivityRepo.getDailyForeCastForFiveDays(it)
+        MainActivityRepo.getDailyForeCastForFiveDays(_cityName.value!!)
     }
 
     fun setCityName(cityName: String) {
